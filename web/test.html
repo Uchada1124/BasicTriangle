@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本三角形</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        #menu {
+            width: 250px;
+            height: 100%;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        #controls label {
+            display: block;
+            width: 150px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            color: black;  /* チェックされていない時のテキスト色 */
+            box-sizing: border-box;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        #controls input {
+            display: none;
+        }
+
+        /* チェックされているときのスタイル */
+        #controls input:checked + label {
+            color: #FFF;
+        }
+
+        .section-divider {
+        border: 0;
+        height: 1px;
+        background-color: #e0e0e0; /* ラインの色を調整 */
+        margin: 20px 0;
+        }
+
+        .section-label {
+            display: block;
+            margin: 20px 0 10px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .controls_all, .controls_line, .controls_plane {
+            margin-bottom: 20px;
+        }
+
+
+        #inputForm {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333333;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #TriangleDiv {
+            flex: 1;
+            height: 100%;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="menu">
+        <div id="inputForm">
+            <label>v_n: <input type="number" id="v_n" min="0" required></label>
+            <br>
+            <label>v_1: <input type="number" id="v_1" min="0" required></label>
+            <br>
+            <label>v_2: <input type="number" id="v_2" min="0" required></label>
+            <br>
+            <label>v_3: <input type="number" id="v_3" min="0" required></label>
+            <br>
+            <label>v_12: <input type="number" id="v_12" min="0" required></label>
+            <br>
+            <label>v_13: <input type="number" id="v_13" min="0" required></label>
+            <br>
+            <label>v_23: <input type="number" id="v_23" min="0" required></label>
+            <br>
+            <button onclick="updateValues()">Update Values</button>
+        </div>
+
+        <div id="controls">
+            <div class="controls_all">
+                <div class="section-label">Plane Controls</div>
+                <hr class="section-divider">
+                
+                <label data-default-bg="gray" data-checked-bg="gray" style="background-color: gray;">
+                    <input type="checkbox" id="toggleAllPlanes"> Show All Planes
+                </label>
+                <br>
+                <label data-default-bg="gray" data-checked-bg="gray" style="background-color: gray;">
+                    <input type="checkbox" id="toggleAllLines" checked> Show All Lines
+                </label>
+                <br>
+            </div>
+
+            <div class="controls_line">
+                <div class="section-label">Line Controls</div>
+                <hr class="section-divider">
+                
+                <label data-default-bg="lightgreen" data-checked-bg="green" style="background-color: green; color: white;">
+                    <input type="checkbox" id="toggleLine1" checked> Show Line 1
+                </label>
+                <br>
+                <label data-default-bg="lightblue" data-checked-bg="blue" style="background-color: blue; color: white;">
+                    <input type="checkbox" id="toggleLine2" checked> Show Line 2
+                </label>
+                <br>
+                <label data-default-bg="lightcoral" data-checked-bg="red" style="background-color: red; color: white;">
+                    <input type="checkbox" id="toggleLine3" checked> Show Line 3
+                </label>
+                <br>
+                <label data-default-bg="lightpink" data-checked-bg="pink" style="background-color: pink; color: white;">
+                    <input type="checkbox" id="toggleLine12" checked> Show Line 12
+                </label>
+                <br>
+                <label data-default-bg="lightsalmon" data-checked-bg="salmon" style="background-color: salmon; color: white;">
+                    <input type="checkbox" id="toggleLine13" checked> Show Line 13
+                </label>
+                <br>
+                <label data-default-bg="lightyellow" data-checked-bg="yellow" style="background-color: yellow; color: white;">
+                    <input type="checkbox" id="toggleLine23" checked> Show Line 23
+                </label>
+            </div>
+
+            <div class="controls_plane">
+                <div class="section-label">Plane Controls</div>
+                <hr class="section-divider">
+
+                <label data-default-bg="lightgreen" data-checked-bg="green" style="background-color: lightgreen;">
+                    <input type="checkbox" id="togglePlane1"> Show Plane 1
+                </label>
+                <br>
+                <label data-default-bg="lightblue" data-checked-bg="blue" style="background-color: lightblue;">
+                    <input type="checkbox" id="togglePlane2"> Show Plane 2
+                </label>
+                <br>
+                <label data-default-bg="lightcoral" data-checked-bg="red" style="background-color: lightcoral;">
+                    <input type="checkbox" id="togglePlane3"> Show Plane 3
+                </label>
+                <br>
+                <label data-default-bg="lightpink" data-checked-bg="pink" style="background-color: lightpink;">
+                    <input type="checkbox" id="togglePlane12"> Show Plane 12
+                </label>
+                <br>
+                <label data-default-bg="lightsalmon" data-checked-bg="salmon" style="background-color: lightsalmon;">
+                    <input type="checkbox" id="togglePlane13"> Show Plane 13
+                </label>
+                <br>
+                <label data-default-bg="lightyellow" data-checked-bg="yellow" style="background-color: lightyellow;">
+                    <input type="checkbox" id="togglePlane23"> Show Plane 23
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="TriangleDiv">
+        <!-- Plotly chart will be drawn inside this DIV -->
+    </div>
+
+    <script>
+        let planeVisible = false;
+        let lineVisible = true;
+
+        function addPlane(x, y, z, color, name, index) {
+            return {
+                x: x,
+                y: y,
+                z: z,
+                i: [0, 0],
+                j: [2, 3],
+                k: [1, 1],
+                type: 'mesh3d',
+                opacity: 0.5,
+                color: color,
+                name: name,
+                visible: document.getElementById('togglePlane' + index).checked ? true : 'legendonly',
+                showlegend: false,
+                hovertemplate: '1: %{z}<br>2: %{x}<br>3: %{z}<extra></extra>'
+            };
+        }
+
+        function addLine(x, y, z, color, name, index) {
+            return {
+                x: x,
+                y: y,
+                z: z,
+                mode: 'line+marker',
+                type: 'scatter3d',
+                line: {
+                    width: 5,
+                    color: color
+                },
+                marker: {
+                    size: 3,
+                    color: color
+                },
+                name: name,
+                visible: document.getElementById('toggleLine' + index).checked ? true : 'legendonly',
+                showlegend: false,
+                hovertemplate: '1: %{z}<br>2: %{x}<br>3: %{y}<extra></extra>'
+            };
+        }
+
+        function updateValues() {
+            const v_n = parseFloat(document.getElementById('v_n').value) || 0;
+            const v_1 = parseFloat(document.getElementById('v_1').value) || 0;
+            const v_2 = parseFloat(document.getElementById('v_2').value) || 0;
+            const v_3 = parseFloat(document.getElementById('v_3').value) || 0;
+            const v_12 = parseFloat(document.getElementById('v_12').value) || 0;
+            const v_13 = parseFloat(document.getElementById('v_13').value) || 0;
+            const v_23 = parseFloat(document.getElementById('v_23').value) || 0;
+
+            if (v_n >= 0 && v_1 >= 0 && v_2 >= 0 && v_3 >= 0 && v_12 >= 0 && v_13 >= 0 && v_23 >= 0) {
+                drawPlot(v_n, v_1, v_2, v_3, v_12, v_13, v_23);
+            } else {
+                alert('All values must be 0 or greater');
+            }
+        }
+
+        function toggleVisibility(id, index, type) {
+            const checkbox = document.getElementById(id);
+            const update = { visible: checkbox.checked ? true : 'legendonly' };
+            Plotly.restyle('TriangleDiv', update, [index]);
+
+            // チェック状態に応じてラベルの色を変更
+            const label = checkbox.closest('label');
+            console.log(label)
+            if (checkbox.checked) {
+                label.style.backgroundColor = label.getAttribute('data-checked-bg');
+                label.style.color = 'white';
+            } else {
+                label.style.backgroundColor = label.getAttribute('data-default-bg');
+                label.style.color = 'black';
+            }
+        }
+
+        document.getElementById('toggleAllPlanes').addEventListener('change', function () {
+            const isVisible = this.checked;
+            document.querySelectorAll('#controls input[id^="togglePlane"]').forEach(function (cb) {
+                cb.checked = isVisible;
+            });
+            const updates = { visible: isVisible ? true : 'legendonly' };
+            Plotly.restyle('TriangleDiv', updates, [1, 3, 5, 7, 9, 11]);
+        });
+
+        document.getElementById('toggleAllLines').addEventListener('change', function () {
+            const isVisible = this.checked;
+            document.querySelectorAll('#controls input[id^="toggleLine"]').forEach(function (cb) {
+                cb.checked = isVisible;
+            });
+            const updates = { visible: isVisible ? true : 'legendonly' };
+            Plotly.restyle('TriangleDiv', updates, [2, 4, 6, 8, 10, 12]);
+        });
+
+        ['Plane1', 'Line1', 'Plane2', 'Line2', 'Plane3', 'Line3', 'Plane12', 'Line12', 'Plane13', 'Line13', 'Plane23', 'Line23'].forEach((id, idx) => {
+            document.getElementById('toggle' + id).addEventListener('change', () => toggleVisibility('toggle' + id, idx + 1, id.startsWith('Plane') ? 'plane' : 'line'));
+        });
+
+        function drawPlot(v_n, v_1, v_2, v_3, v_12, v_13, v_23) {
+            const icon1 = {
+                'width': 500,
+                'height': 600,
+                'path': 'M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z'
+            };
+
+            const layout = {
+                autosize: true,
+                modebardisplay: false,
+                font: {
+                    size: 10
+                },
+                scene: {
+                    aspectmode: "manual",
+                    aspectratio: {
+                        x: 1,
+                        y: 1,
+                        z: 1,
+                    },
+                    xaxis: {
+                        title: '2',
+                        range: [0, v_n],
+                    },
+                    yaxis: {
+                        title: '3',
+                        range: [0, v_n],
+                    },
+                    zaxis: {
+                        title: '1',
+                        range: [0, v_n],
+                    },
+                    camera: {
+                        up: {
+                            x: 0,
+                            y: 0,
+                            z: 1,
+                        },
+                        center: {
+                            x: 0,
+                            y: 0,
+                            z: 0,
+                        },
+                        eye: {
+                            x: 1.25,
+                            y: 1.25,
+                            z: 1.25,
+                        }
+                    }
+                }
+            };
+
+            const basic_triangle = {
+                x: [v_n, 0, 0],
+                y: [0, v_n, 0],
+                z: [0, 0, v_n],
+                i: [0],
+                j: [1],
+                k: [2],
+                type: 'mesh3d',
+                opacity: 0.5,
+                color: 'blue',
+                name: 'BasicTriangle',
+                hovertemplate: '1: %{z}<br>2: %{x}<br>3: %{y}<extra></extra>'
+            };
+
+            const data = [basic_triangle];
+
+            if (v_1 >= 0) {
+                const plane_1 = addPlane([v_n, 0, v_n, 0], [v_n, 0, 0, v_n], [v_1, v_1, v_1, v_1], 'lightgreen', 'Plane_v{1}', 1);
+                const line_1 = addLine([v_n - v_1, 0], [0, v_n - v_1], [v_1, v_1], 'green', 'Line_v{1}', 1);
+                data.push(plane_1, line_1);
+            }
+
+            if (v_2 >= 0) {
+                const plane_2 = addPlane([v_2, v_2, v_2, v_2], [v_n, 0, v_n, 0], [v_n, 0, 0, v_n], 'lightblue', 'Plane_v{2}', 2);
+                const line_2 = addLine([v_2, v_2], [v_n - v_2, 0], [0, v_n - v_2], 'blue', 'Line_v{2}', 2);
+                data.push(plane_2, line_2);
+            }
+
+            if (v_3 >= 0) {
+                const plane_3 = addPlane([v_n, 0, v_n, 0], [v_3, v_3, v_3, v_3], [v_n, 0, 0, v_n], 'lightcoral', 'Plane_v{3}', 3);
+                const line_3 = addLine([v_n - v_3, 0], [v_3, v_3], [0, v_n - v_3], 'red', 'Line_v{3}', 3);
+                data.push(plane_3, line_3);
+            }
+
+            if (v_12 >= 0) {
+                const plane_12 = addPlane([v_12, 0, v_12, 0], [v_n, 0, 0, v_n], [0, v_12, 0, v_12], 'lightpink', 'Plane_v{12}', 12);
+                const line_12 = addLine([0, v_12], [v_n - v_12, v_n - v_12], [v_12, 0], 'pink', 'Line_v{12}', 12);
+                data.push(plane_12, line_12);
+            }
+
+            if (v_13 >= 0) {
+                const plane_13 = addPlane([v_n, 0, 0, v_n], [v_13, 0, v_13, 0], [0, v_13, 0, v_13], 'lightsalmon', 'Plane_v{13}', 13);
+                const line_13 = addLine([v_n - v_13, v_n - v_13], [0, v_13], [v_13, 0], 'salmon', 'Line_v{13}', 13);
+                data.push(plane_13, line_13);
+            }
+
+            if (v_23 >= 0) {
+                const plane_23 = addPlane([v_23, 0, v_23, 0], [0, v_23, 0, v_23], [v_n, 0, 0, v_n], 'lightyellow', 'Plane_v{23}', 23);
+                const line_23 = addLine([0, v_23], [v_23, 0], [v_n - v_23, v_n - v_23], 'yellow', 'Line_v{23}', 23);
+                data.push(plane_23, line_23);
+            }
+
+            const config = {
+                responsive: true,
+                modeBarButtonsToAdd: [
+                    {
+                        name: 'rotate',
+                        icon: icon1,
+                        click: function (gd) {
+                            setInterval(() => {
+                                const newData = gd._fullLayout.scene._scene.getCamera()
+
+                                const currentX = newData.eye.x
+                                const currentY = newData.eye.y
+                                const currentZ = newData.eye.z
+
+                                const newX = (currentX * Math.cos(1 * (Math.PI / 180))) - (currentY * Math.sin(1 * (Math.PI / 180)))
+                                const newY = (currentX * Math.sin(1 * (Math.PI / 180))) + (currentY * Math.cos(1 * (Math.PI / 180)))
+
+                                const update = {
+                                    x: newX,
+                                    y: newY,
+                                    z: currentZ
+                                }
+
+                                Plotly.relayout(gd, 'scene.camera.eye', update)
+                            }, 10)
+                        }
+                    },
+                ]
+            }
+
+            Plotly.newPlot('TriangleDiv', data, layout, config);
+        }
+
+        drawPlot(0, 0, 0, 0, 0, 0, 0);
+    </script>
+
+</body>
+
+</html>

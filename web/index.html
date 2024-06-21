@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本三角形</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- メニュー：入力フォームとトグルスイッチ -->
+    <div id="menu">
+        <!-- Input Vセクション -->
+        <div class="section">
+            <div class="section-label">Input V</div>
+            <hr class="section-divider">
+            <div id="inputForm">
+                <label for="v_n">v_n: <input type="number" id="v_n" min="0" required></label>
+                <br>
+                <label for="v_1">v_1: <input type="number" id="v_1" min="0" required></label>
+                <br>
+                <label for="v_2">v_2: <input type="number" id="v_2" min="0" required></label>
+                <br>
+                <label for="v_3">v_3: <input type="number" id="v_3" min="0" required></label>
+                <br>
+                <label for="v_12">v_12: <input type="number" id="v_12" min="0" required></label>
+                <br>
+                <label for="v_13">v_13: <input type="number" id="v_13" min="0" required></label>
+                <br>
+                <label for="v_23">v_23: <input type="number" id="v_23" min="0" required></label>
+                <br>
+                <button onclick="updateValues()">Update Values</button>
+            </div>
+        </div>
+    
+        <!-- Input Pointsセクション -->
+        <div class="section">
+            <div class="section-label">Input Points</div>
+            <hr class="section-divider">
+            <div id="pointInputForm">
+                <label for="x">1: <input type="number" id="z" step="0.01" required></label>
+                <br>
+                <label for="y">2: <input type="number" id="x" step="0.01" required></label>
+                <br>
+                <label for="z">3: <input type="number" id="y" step="0.01" required></label>
+                <br>
+                <button onclick="addPoint()">Add Point</button>
+            </div>
+        </div>
+
+        <!-- シャープレイ値セクション -->
+        <div class="section">
+            <div class="section-label">Sharpley Value</div>
+            <hr class="section-divider">
+
+            <button onclick="calculateAndPlotShapley()">Calculate and Plot Shapley Values</button>
+        </div>
+    
+        <!-- コントロールセクション -->
+        <div class="section">
+            <div class="section-label">All Controls</div>
+            <hr class="section-divider">
+            <div id="controls">
+                <div class="controls_all">
+                    <label data-default-bg="gray" data-checked-bg="gray" style="background-color: #333; color: #fff;">
+                        <input type="checkbox" id="toggleAllPlanes"> Show All Planes
+                    </label>
+                    <br>
+                    <label data-default-bg="gray" data-checked-bg="gray" style="background-color: #333; color: #fff;">
+                        <input type="checkbox" id="toggleAllLines" checked> Show All Lines
+                    </label>
+                    <br>
+                </div>
+            </div>
+            <div class="section-label">Line Controls</div>
+            <hr class="section-divider">
+            <div id="controls">
+                <div class="controls_line">
+                    <label data-default-bg="#ADD8E6" data-checked-bg="#0000FF" style="background-color: #0000FF; color: white;">
+                        <input type="checkbox" id="toggleLine1" checked> Show Line 1
+                    </label>
+                    <br>
+                    <label data-default-bg="#F08080" data-checked-bg="#FF0000" style="background-color: #FF0000; color: white;">
+                        <input type="checkbox" id="toggleLine2" checked> Show Line 2
+                    </label>
+                    <br>
+                    <label data-default-bg="#98FB98" data-checked-bg="#008000" style="background-color: #008000; color: white;">
+                        <input type="checkbox" id="toggleLine3" checked> Show Line 3
+                    </label>
+                    <br>
+                    <label data-default-bg="#E6E6FA" data-checked-bg="#800080" style="background-color: #800080; color: white;">
+                        <input type="checkbox" id="toggleLine12" checked> Show Line 12
+                    </label>
+                    <br>
+                    <label data-default-bg="#FFDAB9" data-checked-bg="#FFA500" style="background-color: #FFA500; color: white;">
+                        <input type="checkbox" id="toggleLine13" checked> Show Line 13
+                    </label>
+                    <br>
+                    <label data-default-bg="#F5DEB3" data-checked-bg="#A52A2A" style="background-color: #A52A2A; color: white;">
+                        <input type="checkbox" id="toggleLine23" checked> Show Line 23
+                    </label>
+                </div>
+            </div>
+            <div class="section-label">Plane Controls</div>
+            <hr class="section-divider">
+            <div id="controls">
+                <div class="controls_plane">
+                    <label data-default-bg="#ADD8E6" data-checked-bg="#0000FF" style="background-color: #ADD8E6;">
+                        <input type="checkbox" id="togglePlane1"> Show Plane 1
+                    </label>
+                    <br>
+                    <label data-default-bg="#F08080" data-checked-bg="#FF0000" style="background-color: #F08080;">
+                        <input type="checkbox" id="togglePlane2"> Show Plane 2
+                    </label>
+                    <br>
+                    <label data-default-bg="#98FB98" data-checked-bg="#008000" style="background-color: #98FB98;">
+                        <input type="checkbox" id="togglePlane3"> Show Plane 3
+                    </label>
+                    <br>
+                    <label data-default-bg="#E6E6FA" data-checked-bg="#800080" style="background-color: #E6E6FA;">
+                        <input type="checkbox" id="togglePlane12"> Show Plane 12
+                    </label>
+                    <br>
+                    <label data-default-bg="#FFDAB9" data-checked-bg="#FFA500" style="background-color: #FFDAB9;">
+                        <input type="checkbox" id="togglePlane13"> Show Plane 13
+                    </label>
+                    <br>
+                    <label data-default-bg="#F5DEB3" data-checked-bg="#A52A2A" style="background-color: #F5DEB3;">
+                        <input type="checkbox" id="togglePlane23"> Show Plane 23
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plotlyチャートを表示するためのDIV -->
+    <div id="TriangleDiv">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
