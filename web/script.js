@@ -218,11 +218,11 @@ function toggleVisibility(id, index, type) {
     // チェック状態に応じてラベルの色を変更
     const label = checkbox.closest('label');
     if (checkbox.checked) {
-        label.style.backgroundColor = label.getAttribute('data-checked-bg');
+        label.style.backgroundColor = label.getAttribute('default-color');
         label.style.color = 'white';
     } else {
-        label.style.backgroundColor = label.getAttribute('data-default-bg');
-        label.style.color = 'black';
+        label.style.backgroundColor = 'white';
+        label.style.color = label.getAttribute('default-color');
     }
 }
 

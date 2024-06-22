@@ -63,11 +63,6 @@ html {
     display: none;
 }
 
-/* チェックされているときのラベルのスタイル */
-#controls input:checked + label {
-    color: #FFF;
-}
-
 /* セクションのスタイル */
 .section {
     width: 100%; /* メニューの幅に合わせる */
